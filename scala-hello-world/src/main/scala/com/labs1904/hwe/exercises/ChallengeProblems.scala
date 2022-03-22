@@ -118,9 +118,11 @@ object ChallengeProblems {
  */
   def minimumOption(listInt: List[Option[Int]]): Option[Int] = {
     val valInt = listInt.collect { case Some(x) => x }
-    valInt match {
-      Some(valInt) => Some(valInt.min)
-      None => None
+    if (valInt.isEmpty) {
+      None
+    }
+    else {
+      Some(valInt.min)
     }
   }
 }
