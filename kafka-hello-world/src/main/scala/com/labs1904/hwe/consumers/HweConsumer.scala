@@ -11,16 +11,18 @@ import org.apache.kafka.common.serialization.StringDeserializer
 import java.time.Duration
 import java.util.{Arrays, Properties, UUID}
 
+case class RawUser(id: Int, name: String, email: String)
+case class EnrichedUser(id: Int, name: String, email: String, numberAsWord: String, hweDeveloper: String = "Steve Lewis")
+
 object HweConsumer {
-  val BootstrapServer : String = "CHANGEME"
+  val BootstrapServer: String = Util.kafkaConnection("hwe_bootstrap_server")
+  val username: String = Util.kafkaConnection("hwe_username")
+  val password: String = Util.kafkaConnection("hwe_password")
+
+  val trustStore: String = "src/main/resources/kafka.client.truststore.jks"
+
   val consumerTopic: String = "question-1"
   val producerTopic: String = "question-1-output"
-  val username: String = "CHANGEME"
-  val password: String = "CHANGEME"
-  //Use this for Windows
-  val trustStore: String = "src\\main\\resources\\kafka.client.truststore.jks"
-  //Use this for Mac
-  //val trustStore: String = "src/main/resources/kafka.client.truststore.jks"
 
   implicit val formats: DefaultFormats.type = DefaultFormats
 
@@ -48,7 +50,20 @@ object HweConsumer {
         // Retrieve the message from each record
         val message = record.value()
         println(s"Message Received: $message")
-        // TODO: Add business logic here!
+
+        val split: Array[String] = message.split(",")
+        val rawUser: RawUser = RawUser(split(0).toInt, split(1), split(2))
+
+        println(s"Converted to raw case class $rawUser")
+        val enrichedUser: EnrichedUser = EnrichedUser(rawUser.id, rawUser.name, rawUser.email, Util.numberToWordMap(rawUser.id), "Steve")
+
+        println(s"Converted to enriched case class $enrichedUser")
+        val enrichedString: String = enrichedUser.name + "," + enrichedUser.name + "," + enrichedUser.email + "," + enrichedUser.numberAsWord + "," + enrichedUser.hweDeveloper
+
+        println(s"Converted to enrichedString $enrichedString")
+        val producerRecord: ProducerRecord[String, String] = new ProducerRecord[String, String](producerTopic, enrichedString)
+
+        producer.send(producerRecord)
 
       })
     }

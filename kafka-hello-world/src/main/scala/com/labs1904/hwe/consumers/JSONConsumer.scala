@@ -1,5 +1,6 @@
 package com.labs1904.hwe.consumers
 
+import com.labs1904.hwe.util.Util
 import com.labs1904.hwe.util.Util.getScramAuthString
 import net.liftweb.json.{DefaultFormats, parse}
 import org.apache.kafka.clients.consumer.{ConsumerConfig, ConsumerRecord, ConsumerRecords, KafkaConsumer}
@@ -10,15 +11,13 @@ import java.util
 import java.util.{Properties, UUID}
 
 object JSONConsumer {
+  // TODO: this is configured to use kafka running locally, change it to your cluster
+  val BootstrapServer: String = Util.kafkaConnection("hwe_bootstrap_server")
+  val username: String = Util.kafkaConnection("hwe_username")
+  val password: String = Util.kafkaConnection("hwe_password")
+  val trustStore: String = "src/main/resources/kafka.client.truststore.jks"
 
-  val BootstrapServer : String = "CHANGEME"
   val Topic: String = "CHANGEME"
-  val username: String = "CHANGEME"
-  val password: String = "CHANGEME"
-  //Use this for Windows
-  val trustStore: String = "src\\main\\resources\\kafka.client.truststore.jks"
-  //Use this for Mac
-  //val trustStore: String = "src/main/resources/kafka.client.truststore.jks"
 
   implicit val formats: DefaultFormats.type = DefaultFormats
 
