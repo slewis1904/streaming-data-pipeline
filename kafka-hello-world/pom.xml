@@ -110,6 +110,28 @@
       <version>2.7.0</version>
     </dependency>
 
+    <!-- https://mvnrepository.com/artifact/org.scalatest/scalatest -->
+    <dependency>
+      <groupId>org.scalatest</groupId>
+      <artifactId>scalatest_2.12</artifactId>
+      <version>3.2.11</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.scalactic</groupId>
+      <artifactId>scalactic_2.12</artifactId>
+      <version>3.2.11</version>
+    </dependency>
+
+    <!-- https://mvnrepository.com/artifact/org.scalatest/scalatest-funspec -->
+    <dependency>
+      <groupId>org.scalatest</groupId>
+      <artifactId>scalatest-funspec_2.12</artifactId>
+      <version>3.2.11</version>
+      <scope>test</scope>
+    </dependency>
+
     <!-- https://mvnrepository.com/artifact/net.liftweb/lift-json -->
     <dependency>
       <groupId>net.liftweb</groupId>
@@ -121,6 +143,11 @@
       <groupId>it.bitbl</groupId>
       <artifactId>scala-faker_2.12</artifactId>
       <version>0.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-configuration2</artifactId>
+      <version>2.7</version>
     </dependency>
   </dependencies>
 </project>

@@ -1,11 +1,39 @@
 package com.labs1904.hwe.util
 
+import java.util.Properties
+import scala.io.Source
+import scala.collection.JavaConverters._
+
 object Util {
+
+  private val path = "connection.properties"
+  private val url = getClass.getResource(path)
+  private val properties: Properties = new Properties()
+  if (url != null) {
+    val source = Source.fromURL(url)
+    properties.load(source.bufferedReader())
+  }
+  else {
+    println(s"properties file cannot be loaded at path $path")
+    //logger.error("properties file cannot be loaded at path " +path)
+    //throw new FileNotFoundException("Properties file cannot be loaded);
+  }
+  val table = properties.getProperty("hbase_table_name")
+  val zquorum = properties.getProperty("localhost")
+  val port = properties.getProperty("2181")
+
+
   def getScramAuthString(username: String, password: String) = {
    s"""org.apache.kafka.common.security.scram.ScramLoginModule required
    username=\"$username\"
    password=\"$password\";"""
   }
+
+  val kafkaConnection: Map[String, String] = Map[String, String] (
+    "hwe_bootstrap_server" -> "b-2-public.hwe-kafka-cluster.l384po.c8.kafka.us-west-2.amazonaws.com:9196,b-1-public.hwe-kafka-cluster.l384po.c8.kafka.us-west-2.amazonaws.com:9196,b-3-public.hwe-kafka-cluster.l384po.c8.kafka.us-west-2.amazonaws.com:9196",
+    "hwe_username" -> "hwe",
+    "hwe_password" -> "1904labs"
+  )
 
   def mapNumberToWord(number: Int) : String = {
     numberToWordMap(number)
