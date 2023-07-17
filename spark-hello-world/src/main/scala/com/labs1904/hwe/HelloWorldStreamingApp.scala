@@ -13,7 +13,7 @@ import scala.util.Random
  */
 object HelloWorldStreamingApp {
   lazy val logger: Logger = Logger.getLogger(this.getClass)
-  val jobName = "WordCountStreamingApp"
+  val jobName = "WordCountStreamingApp_slewis"
 
   def main(args: Array[String]): Unit = {
     logger.info(s"$jobName starting...")
@@ -23,7 +23,7 @@ object HelloWorldStreamingApp {
       val spark = SparkSession.builder()
         .appName(jobName)
         .config("spark.sql.shuffle.partitions", "3") // limit the number of partitions, otherwise things get slow
-        .master("local[*]") // local execution, the '*' means use all the cpu cores for processing
+        .master("local[2]") // local execution, the '*' means use all the cpu cores for processing
         .getOrCreate()
 
       // For testing, it is much easier to test with everything locally. That way we don't have to go connect
@@ -35,7 +35,7 @@ object HelloWorldStreamingApp {
 
       // Print data out to the console every 5 seconds
       val query = dataset.writeStream
-        .outputMode(OutputMode.Append())
+        .outputMode(OutputMode.Append()) // Changed from Append so we don't have to do watermarks
         .format("console")
         .trigger(Trigger.ProcessingTime("5 seconds"))
         .start()

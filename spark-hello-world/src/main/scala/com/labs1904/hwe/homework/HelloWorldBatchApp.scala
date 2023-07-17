@@ -15,7 +15,7 @@ object HelloWorldBatchApp {
         .appName(jobName)
         .config("spark.sql.shuffle.partitions", "3")
         //TODO- What is local[*] doing here?
-        .master("local[3]")
+        .master("local[2]")
         //TODO- What does Get or Create do?
         .getOrCreate()
 

@@ -8,7 +8,7 @@ case class WordCount(word: String, count: Int)
 
 object WordCountBatchApp {
   lazy val logger: Logger = Logger.getLogger(this.getClass)
-  val jobName = "WordCountBatchApp"
+  val jobName = "WordCountBatchApp_slewis"
 
   def main(args: Array[String]): Unit = {
     logger.info(s"$jobName starting...")
@@ -16,7 +16,7 @@ object WordCountBatchApp {
       val spark = SparkSession.builder()
         .appName(jobName)
         .config("spark.sql.shuffle.partitions", "3")
-        .master("local[*]")
+        .master("local[2]")
         .getOrCreate()
 
       import spark.implicits._
@@ -24,13 +24,11 @@ object WordCountBatchApp {
       //sentences.printSchema
       //sentences.show(false)
 
-      // TODO: implement me
       val counts = sentences.flatMap(row => splitSentenceIntoWords(row))
         .map(word => WordCount(word, 1))
         .groupBy(col("word"))
         .count()
         .sort(col("count").desc)
-        //.show(false)
 
       counts.foreach(wordCount=>println(wordCount))
     } catch {
@@ -38,7 +36,6 @@ object WordCountBatchApp {
     }
   }
 
-  // TODO: implement this function
   // HINT: you may have done this before in Scala practice...
   def splitSentenceIntoWords(sentence: String): Array[String] = {
     sentence.split(" ").map(word => word.toLowerCase.replaceAll("[^a-z]", ""))

@@ -1,7 +1,7 @@
 package com.labs1904.hwe
 
 import org.apache.hadoop.hbase.{HBaseConfiguration, TableName}
-import org.apache.hadoop.hbase.client.{Connection, ConnectionFactory, Get, Table, Put, Scan, Delete}
+import org.apache.hadoop.hbase.client.{Connection, ConnectionFactory, Get, Table, Put, Scan, Delete, Result}
 import org.apache.hadoop.hbase.util.Bytes
 import org.apache.logging.log4j.{LogManager, Logger}
 
@@ -16,15 +16,20 @@ object MyApp {
     var connection: Connection = null
     try {
       val conf = HBaseConfiguration.create()
-      conf.set("hbase.zookeeper.quorum", "hbase02.hourswith.expert:2181")
+      conf.set("hbase.zookeeper.quorum", "hbase01.hourswith.expert:2181")
       connection = ConnectionFactory.createConnection(conf)
       // Example code... change me
       val table = connection.getTable(TableName.valueOf("slewis:users"))
 
-      val get = new Get(Bytes.toBytes("row key"))
-      val result = table.get(get)
-      logger.debug(result)
+      //val get = new Get(Bytes.toBytes("10000001"))
+      //val result = table.get(get)
+      //logger.debug(result)
+      //val email: String = Bytes.toString(result.getValue(Bytes.toBytes("f1"), Bytes.toBytes("mail")))
+      //val email: String = result.getValue("f1", "mail")
+      //logger.debug(email)
 
+      q1_get(table)
+/*
       q1(table)
       q1Alt(table)
       q1List(table)
@@ -33,6 +38,7 @@ object MyApp {
       q3(table)
       q4(table)
       q5(table)
+*/
 
 
     } catch {
@@ -52,11 +58,24 @@ object MyApp {
       val mail = Bytes.toString(result.getValue(Bytes.toBytes("f1"), Bytes.toBytes("mail")))
       logger.debug(mail)
     }
+
+    def q1_get(t: Table): Unit = {
+      val get = new Get("10000001")
+        .addColumn("f1", "mail")
+      val result = t.get(get)
+      val mail = result.getValue("f1", "mail")
+      logger.debug(mail)
+      val email: String = result.getValue("f1", "mail")
+      logger.debug(email)
+      logger.debug(email)
+
+    }
+
     def q1Alt(t: Table) = {
       val get = new Get("10000001")
       val result = t.get(get)
-      val mail: String = result.getValue("f1", "mail")
-      logger.debug(mail)
+      val email: String = result.getValue("f1", "mail")
+      logger.debug(email)
     }
 
     def q1List(t: Table) = {
@@ -85,14 +104,14 @@ object MyApp {
     def q2(t: Table) = {
       val newMessage = new Put(Bytes.toBytes("99"))
       newMessage.addColumn("f1", "username", "DE-HWE")
-      newMessage.addColumn(Bytes.toBytes("f1"), Bytes.toBytes("name"), Bytes.toBytes("The Panther"))
-      newMessage.addColumn(Bytes.toBytes("f1"), Bytes.toBytes("sex"), Bytes.toBytes("F"))
-      newMessage.addColumn(Bytes.toBytes("f1"), Bytes.toBytes("favorite_color"), Bytes.toBytes("pink"))
+      newMessage.addColumn("f1", "name", "The Panther")
+      newMessage.addColumn("f1", "sex", "F")
+      newMessage.addColumn("f1", "favorite_color", "pink")
       t.put(newMessage)
 
-      val get = new Get(Bytes.toBytes("99"))
+      val get = new Get("99")
       val result = t.get(get)
-      val favorite_color = Bytes.toString(result.getValue(Bytes.toBytes("f1"), Bytes.toBytes("favorite_color")))
+      val favorite_color = result.getValue("f1", "favorite_color")
       logger.debug("q2: " + favorite_color)
 
     }
@@ -101,7 +120,7 @@ object MyApp {
     Challenge #3: How many user IDs exist between 10000001 and 10006001? (Not all user IDs exist, so the answer is not
      */
     def q3(t: Table) = {
-      val scan = new Scan().withStartRow(Bytes.toBytes("10000001")).withStopRow(Bytes.toBytes("10006001"))
+      val scan = new Scan().withStartRow("10000001").withStopRow("10006001")
 
       val resultScanner = t.getScanner(scan)
 
@@ -127,17 +146,17 @@ object MyApp {
     Challenge #4: Delete the user with ID = 99 that we inserted earlier.
      */
     def q4(t: Table) = {
-      val getPre = new Get(Bytes.toBytes("99"))
+      val getPre = new Get("99")
       val resultPre = t.get(getPre)
-      val favoriteColorPre = Bytes.toString(resultPre.getValue(Bytes.toBytes("f1"), Bytes.toBytes("favorite_color")))
+      val favoriteColorPre = resultPre.getValue("f1", "favorite_color")
       logger.debug("pre delete: " + favoriteColorPre)
 
-      val delete = new Delete(Bytes.toBytes("99"))
+      val delete = new Delete("99")
       t.delete(delete)
 
-      val getPost = new Get(Bytes.toBytes("99"))
+      val getPost = new Get("99")
       val resultPost = t.get(getPost)
-      val favoriteColorPost = Bytes.toString(resultPost.getValue(Bytes.toBytes("f1"), Bytes.toBytes("favorite_color")))
+      val favoriteColorPost = resultPost.getValue("f1", "favorite_color")
       logger.debug("post delete: " + favoriteColorPost)
 
     }
@@ -148,16 +167,13 @@ object MyApp {
         9005729, 500600, 30059640, 6005263, 800182 (Hint: Look at the Javadoc for "Table")
      */
     def q5(t: Table) = {
-      val listGet = List(Bytes.toBytes("9005729"),
-        Bytes.toBytes("500600"),
-        Bytes.toBytes("30059640"),
-        Bytes.toBytes("6005263"),
-        Bytes.toBytes("800182"))
-        .map(key => new Get(key).addColumn(Bytes.toBytes("f1"),Bytes.toBytes("mail")))
+      val listGet: List[Get] = List("9005729", "500600", "30059640", "6005263", "800182")
+        .map(key => new Get(key).addColumn("f1", "mail"))
+
       import scala.collection.JavaConverters._
-      val results = t.get(listGet.asJava)
+      val results: Array[Result] = t.get(listGet.asJava)
       results.foreach(x =>
-        logger.debug("result: " + Bytes.toString(x.getValue(Bytes.toBytes("f1"), Bytes.toBytes("mail"))))
+        logger.debug("result: " + x.getValue("f1", "mail"))
       )
 
     }

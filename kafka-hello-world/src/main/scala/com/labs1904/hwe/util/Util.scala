@@ -30,8 +30,8 @@ object Util {
   }
 
   val kafkaConnection: Map[String, String] = Map[String, String] (
-    "hwe_bootstrap_server" -> "b-2-public.hwe-kafka-cluster.l384po.c8.kafka.us-west-2.amazonaws.com:9196,b-1-public.hwe-kafka-cluster.l384po.c8.kafka.us-west-2.amazonaws.com:9196,b-3-public.hwe-kafka-cluster.l384po.c8.kafka.us-west-2.amazonaws.com:9196",
-    "hwe_username" -> "hwe",
+    "hwe_bootstrap_server" -> "b-3-public.hwekafkacluster.6d7yau.c16.kafka.us-east-1.amazonaws.com:9196,b-2-public.hwekafkacluster.6d7yau.c16.kafka.us-east-1.amazonaws.com:9196,b-1-public.hwekafkacluster.6d7yau.c16.kafka.us-east-1.amazonaws.com:9196",
+    "hwe_username" -> "1904labs",
     "hwe_password" -> "1904labs"
   )
 

@@ -14,8 +14,8 @@ object KafkaHomework {
    */
 
     //TODO: If these are given in class, change them so that you can run a test. If not, don't worry about this step
-  val BootstrapServer = "change-me"
-  val Topic: String = "change-me"
+  val BootstrapServer = "CHANGE-ME"
+  val Topic: String = "CHANGE-ME"
 
   implicit val formats: DefaultFormats.type = DefaultFormats
 

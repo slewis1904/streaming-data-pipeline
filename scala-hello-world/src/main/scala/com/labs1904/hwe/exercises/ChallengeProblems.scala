@@ -76,6 +76,7 @@ object ChallengeProblems {
    */
   def sumList(listInt: List[Int]): Int = {
     listInt.sum
+    //listInt.foldLeft(0)(_ + _)
   }
 
   /**
@@ -117,7 +118,8 @@ object ChallengeProblems {
   If no ints are provided, return None.
  */
   def minimumOption(listInt: List[Option[Int]]): Option[Int] = {
-    val valInt = listInt.collect { case Some(x) => x }
+    //val valInt = listInt.collect { case Some(x) => x }
+    val valInt = listInt.flatten
     if (valInt.isEmpty) {
       None
     }

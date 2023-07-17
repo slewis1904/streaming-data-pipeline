@@ -23,6 +23,7 @@ class StretchProblemsTests extends FunSpec {
       assert(actual === expected)
     }
   }
+
   describe("Testing NextBiggestNumber - Working with numbers, strings, and lists") {
     it("should return the next biggest number for straightforward examples") {
       assert(StretchProblems.getNextBiggestNumber(12) === 21)

@@ -14,12 +14,12 @@ import java.util.Properties
  */
 object WordCountStreamingApp {
   lazy val logger: Logger = Logger.getLogger(this.getClass)
-  val jobName = "WordCountStreamingApp"
+  val jobName = "WordCountStreamingApp_slewis"
   // TODO: define the schema for parsing data from Kafka
 
-  val bootstrapServer : String = "CHANGEME"
-  val username: String = "CHANGEME"
-  val password: String = "CHANGEME"
+  val bootstrapServer : String = "b-3-public.hwekafkacluster.6d7yau.c16.kafka.us-east-1.amazonaws.com:9196,b-2-public.hwekafkacluster.6d7yau.c16.kafka.us-east-1.amazonaws.com:9196,b-1-public.hwekafkacluster.6d7yau.c16.kafka.us-east-1.amazonaws.com:9196"
+  val username: String = "1904labs"
+  val password: String = "1904labs"
   val Topic: String = "word-count"
 
   //Use this for Windows
@@ -34,7 +34,7 @@ object WordCountStreamingApp {
       val spark = SparkSession.builder()
         .appName(jobName)
         .config("spark.sql.shuffle.partitions", "3")
-        .master("local[*]")
+        .master("local[2]")
         .getOrCreate()
 
       import spark.implicits._
@@ -57,12 +57,20 @@ object WordCountStreamingApp {
         .selectExpr("CAST(value AS STRING)").as[String]
 
       sentences.printSchema
+      //root
+      //|-- value: string (nullable = true)
 
-      // TODO: implement me
-      //val counts = ???
+      val counts = sentences
+        .flatMap(row => splitSentenceIntoWords(row))
+        .map(word => WordCount(word, 1))
+        .groupBy(col("word"))
+        .count()
+        .sort(col("count").desc)
+        .limit(10)
 
-      val query = sentences.writeStream
-        .outputMode(OutputMode.Append())
+      val query = counts.writeStream
+//        .outputMode(OutputMode.Append())
+        .outputMode(OutputMode.Complete()) // Changed from Append so we don't have to do watermarks
         .format("console")
         .trigger(Trigger.ProcessingTime("5 seconds"))
         .start()
@@ -77,6 +85,10 @@ object WordCountStreamingApp {
     s"""org.apache.kafka.common.security.scram.ScramLoginModule required
    username=\"$username\"
    password=\"$password\";"""
+  }
+
+  def splitSentenceIntoWords(sentence: String): Array[String] = {
+    sentence.split(" ").map(word => word.toLowerCase.replaceAll("[^a-z]", ""))
   }
 
 }

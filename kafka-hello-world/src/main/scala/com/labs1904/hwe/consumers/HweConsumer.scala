@@ -51,11 +51,11 @@ object HweConsumer {
         val message = record.value()
         println(s"Message Received: $message")
 
-        val split: Array[String] = message.split(",")
+        val split: Array[String] = message.split("\t")
         val rawUser: RawUser = RawUser(split(0).toInt, split(1), split(2))
 
         println(s"Converted to raw case class $rawUser")
-        val enrichedUser: EnrichedUser = EnrichedUser(rawUser.id, rawUser.name, rawUser.email, Util.numberToWordMap(rawUser.id), "Steve")
+        val enrichedUser: EnrichedUser = EnrichedUser(rawUser.id, rawUser.name, rawUser.email, Util.numberToWordMap(rawUser.id), "Steve Test")
 
         println(s"Converted to enriched case class $enrichedUser")
         val enrichedString: String = enrichedUser.name + "," + enrichedUser.name + "," + enrichedUser.email + "," + enrichedUser.numberAsWord + "," + enrichedUser.hweDeveloper
@@ -63,9 +63,15 @@ object HweConsumer {
         println(s"Converted to enrichedString $enrichedString")
         val producerRecord: ProducerRecord[String, String] = new ProducerRecord[String, String](producerTopic, enrichedString)
 
-        producer.send(producerRecord)
+        //producer.send(producerRecord)
 
+        val newRecord = s"${enrichedUser.id}, ${enrichedUser.numberAsWord}, ${enrichedUser.hweDeveloper}"
+        println(producerTopic)
+        println(newRecord)
+        producer.send(new ProducerRecord[String, String](producerTopic, newRecord))
+        println("done")
       })
     }
   }
+
 }
